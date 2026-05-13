@@ -113,7 +113,14 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # Randomization
         self.events.push_robot = None
-        self.events.add_base_mass = None
+        self.events.add_base_mass = EventTerm(
+            func=mdp.add_body_mass,
+            params={
+                "mass_range": (-1.0, 2.0),
+                "asset_cfg": SceneEntityCfg("robot", body_names=["torso_link"])
+            },
+            mode="reset",
+        )
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["torso_link"]
         self.events.reset_base.params = {
@@ -150,6 +157,14 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # terminations
         self.terminations.base_contact.params["sensor_cfg"].body_names = "torso_link"
+
+        # add imu sensor
+        from isaaclab.sensors import ImuCfg
+        self.scene.imu = ImuCfg(
+            # torso_link, left_thigh_link, right_thigh_link
+            prim_path="{ENV_REGEX_NS}/Robot/.*(torso_link|thigh_link)",
+            update_period=0.01, # 100Hz 
+        )
 
 
 @configclass

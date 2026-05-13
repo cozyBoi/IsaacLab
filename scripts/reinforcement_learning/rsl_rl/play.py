@@ -186,6 +186,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
+            imu_acc = env.scene["imu"].data.root_lin_acc_b
+            all_forces = env.scene["robot"].data.joint_force
+            knee_moments = all_forces[:, knee_joint_ids, 3:6]
+            print(imu_acc)
+            print(knee_moments)
         if args_cli.video:
             timestep += 1
             # Exit the play loop after recording one video
