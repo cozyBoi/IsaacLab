@@ -7,7 +7,7 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.utils import configclass
-import isaaclab.envs.mdp as core_mdp
+from isaaclab.envs.mdp.events import randomize_rigid_body_mass
 
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
 from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
@@ -116,10 +116,12 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Randomization
         self.events.push_robot = None
         self.events.add_base_mass = EventTerm(
-            func=core_mdp.add_body_mass,
+            func=randomize_rigid_body_mass,
             params={
-                "mass_range": (-1.0, 2.0),
-                "asset_cfg": SceneEntityCfg("robot", body_names=["torso_link"])
+                "asset_cfg": SceneEntityCfg("robot", body_names=["torso_link"]),
+                "mass_distribution_params": (-1.0, 2.0),
+                "operation": "add", 
+                "distribution": "uniform",
             },
             mode="reset",
         )
