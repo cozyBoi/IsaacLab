@@ -204,6 +204,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_dir, "params", "agent.yaml"), agent_cfg)
 
+    print("-" * 30)
+    joint_names = env.scene["robot"].data.joint_names
+    for i, name in enumerate(joint_names):
+        print(f"ID {i}: {name}")
+    print("-" * 30)
+    
     # run training
     runner.learn(num_learning_iterations=agent_cfg.max_iterations, init_at_random_ep_len=True)
 
