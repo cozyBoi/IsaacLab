@@ -115,7 +115,7 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Randomization
         self.events.push_robot = None
         self.events.add_base_mass = EventTerm(
-            func=mdp.add_body_mass,
+            func=isaaclab.envs.mdp.add_body_mass,
             params={
                 "mass_range": (-1.0, 2.0),
                 "asset_cfg": SceneEntityCfg("robot", body_names=["torso_link"])
