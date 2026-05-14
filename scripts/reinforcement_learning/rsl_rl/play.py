@@ -193,8 +193,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
             left_knee_moment = knee_torques[:, 0]
             right_knee_moment = knee_torques[:, 1]
-            print(imu_acc)
-            print(knee_moments)
+            print(imu_acc[:3])
+            print(right_knee_moment[:3])
         if args_cli.video:
             timestep += 1
             # Exit the play loop after recording one video
