@@ -190,9 +190,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
-            all_forces = env.unwrapped.scene["robot"].data.applied_torque # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
-            left_knee_moment = all_joint_forces[:, 11, 3:]
-            right_knee_moment = all_joint_forces[:, 12, 3:]
+            knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
+            left_knee_moment = knee_torques[:, 0]
+            right_knee_moment = knee_torques[:, 1]
             print(imu_acc)
             print(knee_moments)
         if args_cli.video:
