@@ -187,7 +187,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             # env stepping
             obs, _, _, _ = env.step(actions)
             imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
-            all_forces = env.unwrapped.scene["robot"].data.joint_force
+
+            # 1. applied_torque
+            # 2. body_incoming_joint_wrench_b
+            all_forces = env.unwrapped.scene["robot"].data.applied_torque # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
             left_knee_moment = all_joint_forces[:, 11, 3:]
             right_knee_moment = all_joint_forces[:, 12, 3:]
             print(imu_acc)
