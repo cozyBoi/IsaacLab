@@ -186,8 +186,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             actions = policy(obs)
             # env stepping
             obs, _, _, _ = env.step(actions)
-            imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
-
+            
             torso_accel = env.unwrapped.scene["imu_torso"].data.lin_acc_b
             l_thigh_accel = env.unwrapped.scene["imu_l_thigh"].data.lin_acc_b
             r_thigh_accel = env.unwrapped.scene["imu_r_thigh"].data.lin_acc_b
