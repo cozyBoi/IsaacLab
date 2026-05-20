@@ -188,14 +188,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             obs, _, _, _ = env.step(actions)
             imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
 
-            print(dir(env.unwrapped.scene["imu"]))
             imu_sensor = env.unwrapped.scene["imu"]
-            print("=" * 60)
-            print("[DEBUG] The order of IMU sensor matching the actual USD prim path order:")
-            for idx, prim in enumerate(imu_sensor._parent_prims):
-                print(f"index {idx}: {prim}")
-                print(dir(prim))
-            print("=" * 60)
+            imu_data = imu_sensor.data
+            print(f"linear acceleration tensor structure (Shape): {imu_data.lin_acc_b.shape}")
+            matched_bodies = [prim.GetPath().name for prim in imu_sensor._parent_prims[:3]]
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
