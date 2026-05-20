@@ -57,6 +57,8 @@ import gymnasium as gym
 import os
 import time
 import torch
+import pandas as pd
+import numpy as np
 
 from rsl_rl.runners import DistillationRunner, OnPolicyRunner
 
@@ -178,12 +180,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     obs = env.get_observations()
     timestep = 0
     # simulate environment
-
-    import os
-    import pandas as pd
-    import numpy as np
-
-    # 저장할 컬럼 이름 정의
+    # define the columns to save
     columns = [
         'Header',
         'thigh_Accel_X', 'thigh_Accel_Y', 'thigh_Accel_Z',
