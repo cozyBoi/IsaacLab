@@ -189,8 +189,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
 
             print(dir(env.unwrapped.scene["imu"]))
-            print(env.unwrapped.scene["imu"].body_names)
-            print(dir(env.unwrapped.scene["imu"].body_names))
+            imu_sensor = env.unwrapped.scene["imu"]
+            print("=" * 60)
+            print("[DEBUG] The order of IMU sensor matching the actual USD prim path order:")
+            for idx, prim in enumerate(imu_sensor._parent_prims):
+                print(f"index {idx}: {prim}")
+            print("=" * 60)
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b

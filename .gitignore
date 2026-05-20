@@ -2,7 +2,6 @@
 **/cmake-build*/
 **/build*/
 **/*.so
-**/*.log*
 
 # Omniverse
 **/*.dmp
@@ -55,7 +54,6 @@ _build
 
 # RL-Games
 **/runs/*
-**/logs/*
 **/recordings/*
 
 # Pre-Trained Checkpoints
