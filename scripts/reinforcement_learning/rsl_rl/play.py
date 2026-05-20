@@ -190,8 +190,25 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
             imu_sensor = env.unwrapped.scene["imu"]
             imu_data = imu_sensor.data
-            print(f"linear acceleration tensor structure (Shape): {imu_data.lin_acc_b.shape}")
             matched_bodies = [prim.GetPath().name for prim in imu_sensor._parent_prims[:3]]
+            print(f"matched bodies: {matched_bodies}")
+
+            raw_acc = imu_sensor.data.lin_acc_b
+            raw_gyro = imu_sensor.data.ang_vel_b
+            acc_3d = raw_acc.view(32, 3, 3)
+            gyro_3d = raw_gyro.view(32, 3, 3)
+
+            torso_idx = matched_bodies.index("torso_link")
+            l_thigh_idx = matched_bodies.index("left_hip_yaw_link")
+            r_thigh_idx = matched_bodies.index("right_hip_yaw_link")
+
+            torso_accel = acc_3d[0, torso_idx, :]
+            l_thigh_accel = acc_3d[0, l_thigh_idx, :]
+            r_thigh_accel = acc_3d[0, r_thigh_idx, :]
+
+            torso_gyro = gyro_3d[0, torso_idx, :]
+            l_thigh_gyro = gyro_3d[0, l_thigh_idx, :]
+            r_thigh_gyro = gyro_3d[0, r_thigh_idx, :]
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
