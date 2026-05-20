@@ -193,6 +193,18 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             matched_bodies = [prim.GetPath().name for prim in imu_sensor._parent_prims[:3]]
             print(f"matched bodies: {matched_bodies}")
 
+            print("=" * 80)
+            print("[DEBUG] The full list of actual USD absolute path (first 5 only):")
+            for prim in imu_sensor._parent_prims[:5]:
+                print(prim.GetPath().pathString)
+
+            print("-" * 80)
+            print("[DEBUG] Check the 35th and 65th paths behind:")
+            if len(imu_sensor._parent_prims) > 65:
+                print("35th:", imu_sensor._parent_prims[32].GetPath().pathString)
+                print("65th:", imu_sensor._parent_prims[64].GetPath().pathString)
+            print("=" * 80)
+
             raw_acc = imu_sensor.data.lin_acc_b
             raw_gyro = imu_sensor.data.ang_vel_b
             acc_3d = raw_acc.view(32, 3, 3)
