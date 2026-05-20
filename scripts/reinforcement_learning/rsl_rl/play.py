@@ -194,6 +194,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             print("[DEBUG] The order of IMU sensor matching the actual USD prim path order:")
             for idx, prim in enumerate(imu_sensor._parent_prims):
                 print(f"index {idx}: {prim}")
+                print(dir(prim))
             print("=" * 60)
 
             # 1. applied_torque
