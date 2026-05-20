@@ -188,6 +188,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             obs, _, _, _ = env.step(actions)
             imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
 
+            print(dir(env.unwrapped.scene["imu"]))
+            print(env.unwrapped.scene["imu"].body_names)
+            print(dir(env.unwrapped.scene["imu"].body_names))
+
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
             knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
