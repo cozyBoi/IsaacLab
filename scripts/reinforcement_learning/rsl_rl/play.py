@@ -190,11 +190,16 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         'knee_angle_r_moment'
     ]
 
+    # saving file config
     num_envs = env.num_envs
-    # 각 환경별 데이터를 담을 딕셔너리 리스트 생성
     env_data_buffers = {i: [] for i in range(num_envs)}
+    current_sim_time = 0.0 
 
-    current_sim_time = 0.0  # Header에 들어갈 시뮬레이션 타임 스탬프
+    # batch config
+    step_counter = 0
+    SAVE_INTERVAL_STEPS = 1000 
+    output_dir = "collected_gait_data"
+    os.makedirs(output_dir, exist_ok=True)
 
     while simulation_app.is_running():
         start_time = time.time()
@@ -233,7 +238,22 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                     t_gyr[env_id, 0],  t_gyr[env_id, 1],  t_gyr[env_id, 2],   # trunk_Gyro
                     rk_mom[env_id]                                            # knee_angle_r_moment
                 ]
-                # env_data_buffers[env_id].append(row)
+                env_data_buffers[env_id].append(row)
+            current_sim_time += dt
+            step_counter += 1
+
+            if step_counter % SAVE_INTERVAL_STEPS == 0:
+                for env_id in range(num_envs):
+                    if len(env_data_buffers[env_id]) > 0:
+                        df = pd.DataFrame(env_data_buffers[env_id], columns=columns)
+                        file_path = os.path.join(output_dir, f"env_{env_id:02d}_right_leg.csv")
+                        
+                        is_first_write = not os.path.exists(file_path)
+                        df.to_csv(file_path, mode='a', index=False, header=is_first_write)
+                        
+                        env_data_buffers[env_id] = []
+                
+                print(f"[Batch saved] Simulation time {current_sim_time:.2f} seconds ({step_counter} steps) data has been recorded to disk.")
 
         if args_cli.video:
             timestep += 1
