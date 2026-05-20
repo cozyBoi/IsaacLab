@@ -173,11 +173,32 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     export_policy_as_onnx(policy_nn, normalizer=normalizer, path=export_model_dir, filename="policy.onnx")
 
     dt = env.unwrapped.step_dt
-
+    print(f"Current control loop frequency: {1.0 / dt} Hz")
     # reset environment
     obs = env.get_observations()
     timestep = 0
     # simulate environment
+
+    import os
+    import pandas as pd
+    import numpy as np
+
+    # 저장할 컬럼 이름 정의
+    columns = [
+        'Header',
+        'thigh_Accel_X', 'thigh_Accel_Y', 'thigh_Accel_Z',
+        'thigh_Gyro_X', 'thigh_Gyro_Y', 'thigh_Gyro_Z',
+        'trunk_Accel_X', 'trunk_Accel_Y', 'trunk_Accel_Z',
+        'trunk_Gyro_X', 'trunk_Gyro_Y', 'trunk_Gyro_Z',
+        'knee_angle_r_moment'
+    ]
+
+    num_envs = env.num_envs
+    # 각 환경별 데이터를 담을 딕셔너리 리스트 생성
+    env_data_buffers = {i: [] for i in range(num_envs)}
+
+    current_sim_time = 0.0  # Header에 들어갈 시뮬레이션 타임 스탬프
+
     while simulation_app.is_running():
         start_time = time.time()
         # run everything in inference mode
@@ -187,23 +208,36 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             # env stepping
             obs, _, _, _ = env.step(actions)
 
-            torso_accel = env.unwrapped.scene["imu_torso"].data.lin_acc_b
-            print(f"torso_accel shape: {torso_accel.shape}")
-            l_thigh_accel = env.unwrapped.scene["imu_l_thigh"].data.lin_acc_b
-            r_thigh_accel = env.unwrapped.scene["imu_r_thigh"].data.lin_acc_b
+            torso_accel = env.unwrapped.scene["imu_torso"].data.lin_acc_b # shape: (env_num, 3)
+            l_thigh_accel = env.unwrapped.scene["imu_l_thigh"].data.lin_acc_b # shape: (env_num, 3)
+            r_thigh_accel = env.unwrapped.scene["imu_r_thigh"].data.lin_acc_b # shape: (env_num, 3)
 
-            torso_gyro = env.unwrapped.scene["imu_torso"].data.ang_vel_b
-            l_thigh_gyro = env.unwrapped.scene["imu_l_thigh"].data.ang_vel_b
-            r_thigh_gyro = env.unwrapped.scene["imu_r_thigh"].data.ang_vel_b
+            torso_gyro = env.unwrapped.scene["imu_torso"].data.ang_vel_b # shape: (env_num, 3)
+            l_thigh_gyro = env.unwrapped.scene["imu_l_thigh"].data.ang_vel_b # shape: (env_num, 3)
+            r_thigh_gyro = env.unwrapped.scene["imu_r_thigh"].data.ang_vel_b # shape: (env_num, 3)
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
             knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
-            left_knee_moment = knee_torques[:, 0]
-            right_knee_moment = knee_torques[:, 1]
-            print(torso_accel[:3])
-            print(torso_gyro[:3])
-            print(right_knee_moment[:3])
+            
+            t_acc = torso_accel.cpu().numpy()
+            t_gyr = torso_gyro.cpu().numpy()
+            rt_acc = r_thigh_accel.cpu().numpy()
+            rt_gyr = r_thigh_gyro.cpu().numpy()
+            rk_mom = right_knee_moment.cpu().numpy()
+
+            # 3. 각 환경(env)별로 슬라이싱하여 버퍼에 쌓기 (오른쪽 위주)
+            for env_id in range(num_envs):
+                row = [
+                    current_sim_time,
+                    rt_acc[env_id, 0], rt_acc[env_id, 1], rt_acc[env_id, 2],  # thigh_Accel
+                    rt_gyr[env_id, 0], rt_gyr[env_id, 1], rt_gyr[env_id, 2],  # thigh_Gyro
+                    t_acc[env_id, 0],  t_acc[env_id, 1],  t_acc[env_id, 2],   # trunk_Accel
+                    t_gyr[env_id, 0],  t_gyr[env_id, 1],  t_gyr[env_id, 2],   # trunk_Gyro
+                    rk_mom[env_id]                                            # knee_angle_r_moment
+                ]
+                # env_data_buffers[env_id].append(row)
+
         if args_cli.video:
             timestep += 1
             # Exit the play loop after recording one video
