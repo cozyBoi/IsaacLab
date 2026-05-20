@@ -197,7 +197,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # batch config
     step_counter = 0
-    SAVE_INTERVAL_STEPS = 1000 
+    SAVE_INTERVAL_STEPS = 100
     output_dir = "collected_gait_data"
     os.makedirs(output_dir, exist_ok=True)
 
@@ -222,7 +222,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             # 2. body_incoming_joint_wrench_b
             knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
             right_knee_moment = knee_torques[:, 1] # (env_num,)
-            
+
             t_acc = torso_accel.cpu().numpy()
             t_gyr = torso_gyro.cpu().numpy()
             rt_acc = r_thigh_accel.cpu().numpy()
