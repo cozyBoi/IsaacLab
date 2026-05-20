@@ -188,7 +188,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             obs, _, _, _ = env.step(actions)
 
             torso_accel = env.unwrapped.scene["imu_torso"].data.lin_acc_b
-            print(shape(torso_accel))
+            print(f"torso_accel shape: {torso_accel.shape}")
             l_thigh_accel = env.unwrapped.scene["imu_l_thigh"].data.lin_acc_b
             r_thigh_accel = env.unwrapped.scene["imu_r_thigh"].data.lin_acc_b
 
