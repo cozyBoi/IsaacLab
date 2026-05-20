@@ -188,46 +188,21 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             obs, _, _, _ = env.step(actions)
             imu_acc = env.unwrapped.scene["imu"].data.lin_acc_b # source/isaaclab/isaaclab/sensors/imu/imu_data.py
 
-            imu_sensor = env.unwrapped.scene["imu"]
-            imu_data = imu_sensor.data
-            matched_bodies = [prim.GetPath().name for prim in imu_sensor._parent_prims[:3]]
-            print(f"matched bodies: {matched_bodies}")
+            torso_accel = env.unwrapped.scene["imu_torso"].data.lin_acc_b
+            l_thigh_accel = env.unwrapped.scene["imu_l_thigh"].data.lin_acc_b
+            r_thigh_accel = env.unwrapped.scene["imu_r_thigh"].data.lin_acc_b
 
-            print("=" * 80)
-            print("[DEBUG] The full list of actual USD absolute path (first 5 only):")
-            for prim in imu_sensor._parent_prims[:5]:
-                print(prim.GetPath().pathString)
-
-            print("-" * 80)
-            print("[DEBUG] Check the 35th and 65th paths behind:")
-            if len(imu_sensor._parent_prims) > 65:
-                print("35th:", imu_sensor._parent_prims[32].GetPath().pathString)
-                print("65th:", imu_sensor._parent_prims[64].GetPath().pathString)
-            print("=" * 80)
-
-            raw_acc = imu_sensor.data.lin_acc_b
-            raw_gyro = imu_sensor.data.ang_vel_b
-            acc_3d = raw_acc.view(32, 3, 3)
-            gyro_3d = raw_gyro.view(32, 3, 3)
-
-            torso_idx = matched_bodies.index("torso_link")
-            l_thigh_idx = matched_bodies.index("left_hip_yaw_link")
-            r_thigh_idx = matched_bodies.index("right_hip_yaw_link")
-
-            torso_accel = acc_3d[0, torso_idx, :]
-            l_thigh_accel = acc_3d[0, l_thigh_idx, :]
-            r_thigh_accel = acc_3d[0, r_thigh_idx, :]
-
-            torso_gyro = gyro_3d[0, torso_idx, :]
-            l_thigh_gyro = gyro_3d[0, l_thigh_idx, :]
-            r_thigh_gyro = gyro_3d[0, r_thigh_idx, :]
+            torso_gyro = env.unwrapped.scene["imu_torso"].data.ang_vel_b
+            l_thigh_gyro = env.unwrapped.scene["imu_l_thigh"].data.ang_vel_b
+            r_thigh_gyro = env.unwrapped.scene["imu_r_thigh"].data.ang_vel_b
 
             # 1. applied_torque
             # 2. body_incoming_joint_wrench_b
             knee_torques = env.unwrapped.scene["robot"].data.applied_torque[:, 11:13] # source/isaaclab/isaaclab/assets/articulation/articulation_data.py
             left_knee_moment = knee_torques[:, 0]
             right_knee_moment = knee_torques[:, 1]
-            print(imu_acc[:3])
+            print(torso_accel[:3])
+            print(torso_gyro[:3])
             print(right_knee_moment[:3])
         if args_cli.video:
             timestep += 1

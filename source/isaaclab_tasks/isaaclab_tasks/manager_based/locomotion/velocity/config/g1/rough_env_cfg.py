@@ -164,10 +164,17 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
 
         # add imu sensor
         from isaaclab.sensors import ImuCfg
-        self.scene.imu = ImuCfg(
-            # torso_link, left_thigh_link, right_thigh_link
-            prim_path="{ENV_REGEX_NS}/Robot/.*(torso_link|hip_yaw_link)", # https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.sensors.html#isaaclab.sensors.ImuCfg.prim_path
+        self.scene.imu_torso = ImuCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/.*torso_link",
             update_period=0.01, # 100Hz 
+        )
+        self.scene.imu_l_thigh = ImuCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/.*left_hip_yaw_link",
+            update_period=0.01,
+        )
+        self.scene.imu_r_thigh = ImuCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/.*right_hip_yaw_link",
+            update_period=0.01,
         )
 
 
