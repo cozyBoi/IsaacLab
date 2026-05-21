@@ -118,12 +118,12 @@ class G1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.add_base_mass = EventTerm(
             func=randomize_rigid_body_mass,
             params={
-                "asset_cfg": SceneEntityCfg("robot", body_names=["torso_link"]),
-                "mass_distribution_params": (-1.0, 2.0),
-                "operation": "add", 
+                "asset_cfg": SceneEntityCfg("robot"),
+                "mass_distribution_params": (0.5, 2.0), 
+                "operation": "scale",
                 "distribution": "uniform",
             },
-            mode="reset",
+            mode="startup",
         )
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
         self.events.base_external_force_torque.params["asset_cfg"].body_names = ["torso_link"]
