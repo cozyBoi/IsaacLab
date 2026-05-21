@@ -245,7 +245,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             step_counter += 1
 
             if step_counter % SAVE_INTERVAL_STEPS == 0:
-                all_robot_masses = torch.sum(env.unwrapped.scene["robot"].data.default_mass, dim=-1).cpu().numpy()
+                real_body_masses = env.unwrapped.scene["robot"].root_physx_view.get_masses()
+                all_robot_masses = torch.sum(real_body_masses, dim=-1).cpu().numpy()
                 for env_id in range(num_envs):
                     if len(env_data_buffers[env_id]) > 0:
                         df = pd.DataFrame(env_data_buffers[env_id], columns=columns)
