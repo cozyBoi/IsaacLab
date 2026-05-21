@@ -229,10 +229,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             rt_gyr = r_thigh_gyro.cpu().numpy()
             rk_mom = right_knee_moment.cpu().numpy()
 
+            clean_time = round(current_sim_time, 4)
             # 3. 각 환경(env)별로 슬라이싱하여 버퍼에 쌓기 (오른쪽 위주)
             for env_id in range(num_envs):
                 row = [
-                    current_sim_time,
+                    clean_time,
                     rt_acc[env_id, 0], rt_acc[env_id, 1], rt_acc[env_id, 2],  # thigh_Accel
                     rt_gyr[env_id, 0], rt_gyr[env_id, 1], rt_gyr[env_id, 2],  # thigh_Gyro
                     t_acc[env_id, 0],  t_acc[env_id, 1],  t_acc[env_id, 2],   # trunk_Accel
