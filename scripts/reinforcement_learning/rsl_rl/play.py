@@ -245,6 +245,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             step_counter += 1
 
             if step_counter % SAVE_INTERVAL_STEPS == 0:
+                all_robot_masses = torch.sum(env.unwrapped.scene["robot"].data.default_mass, dim=-1).cpu().numpy()
                 for env_id in range(num_envs):
                     if len(env_data_buffers[env_id]) > 0:
                         df = pd.DataFrame(env_data_buffers[env_id], columns=columns)
@@ -252,6 +253,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                         
                         is_first_write = not os.path.exists(file_path)
                         df.to_csv(file_path, mode='a', index=False, header=is_first_write)
+
+                        spec_file_path = os.path.join(output_dir, f"env_{env_id:02d}_specs.txt")
+                        
+                        if not os.path.exists(spec_file_path):
+                            with open(spec_file_path, "w") as f:
+                                f.write(f"height_m: 1.2700\n")
+                                f.write(f"weight_kg: {all_robot_masses[env_id]:.4f}\n")
                         
                         env_data_buffers[env_id] = []
                 
